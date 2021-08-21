@@ -13,11 +13,7 @@ if (cluster.isMaster) {
     i++;
   }
   cluster.on("fork", (worker) => {
-    console.log(
-      `Worker ->  ${worker.isDead()} id >>>> ${worker.id} pid>> ${
-        worker.process.pid
-      }.`
-    );
+    console.log(`Worker id -> ${worker.id} pid ->  ${worker.process.pid}.`);
   });
   cluster.on("exit", (worker) => {
     console.log(
