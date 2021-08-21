@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon ./src/server.js",
-    "load": "loadtest -n 1000 -c 100 --rps 200 http://localhost:3000/?number=10"
+    "loadTest": "loadtest -n 1000 -c 100 --rps 200 http://localhost:3000/?number=10",
+    "loadArtillery": "artillery quick --count 10 -n 20 http://localhost:3000/?number=13"
   },
   "keywords": [],
   "author": "",
