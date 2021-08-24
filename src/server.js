@@ -11,9 +11,13 @@ if (cluster.isMaster) {
   const worker2 = require("child_process").fork("./workers/worker2");
   console.log(`worker 1 ${worker1.pid}`);
   console.log(`worker 2 ${worker2.pid}`);
-
-  worker1.on("message", (number) => console.log(`Child process 1 ${number}`));
-  worker2.on("message", (number) => console.log(`Child process 2 ${number}`));
+  // process the result
+  worker1.on("message", (number) =>
+    console.log(`Child process 1 result ->  ${number}`)
+  );
+  worker2.on("message", (number) =>
+    console.log(`Child process 2 result -> ${number}`)
+  );
 
   cluster.on("online", (worker) => {
     worker.on("message", (num) => {
