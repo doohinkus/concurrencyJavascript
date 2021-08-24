@@ -7,30 +7,34 @@ const port = 3000;
 
 if (cluster.isMaster) {
   console.log(`Total number cpus ${totalCPUs}`);
+  const worker1 = require("child_process").fork("./workers/worker1");
+  const worker2 = require("child_process").fork("./workers/worker2");
+  console.log(`worker 1 ${worker1.pid}`);
+  console.log(`worker 2 ${worker2.pid}`);
+
+  worker1.on("message", (number) => console.log(`Child process 1 ${number}`));
+  worker2.on("message", (number) => console.log(`Child process 2 ${number}`));
+
+  cluster.on("online", (worker) => {
+    worker.on("message", (num) => {
+      if (num % 2 === 0) worker1.send(num);
+      else worker2.send(num);
+    });
+  });
   let i = 0;
   while (i < totalCPUs) {
-    cluster.fork();
+    let worker = cluster.fork();
+    console.log(`Workier taking work on pid -> ${worker.process.pid}`);
     i++;
   }
-  cluster.on("fork", (worker) => {
-    console.log(`Worker id -> ${worker.id} pid ->  ${worker.process.pid}.`);
-  });
-  cluster.on("exit", (worker) => {
-    console.log(
-      `Worker EXIT ->  ${worker.isDead()} -> id >>>> ${worker.id} pid>> ${
-        worker.process.pid
-      }.`
-    );
-    console.log("Forking worker now!!!");
-    cluster.fork();
-  });
 } else {
   const app = express();
   app.get("/", (req, res) => {
-    console.log(`Worker id >>>> ${cluster.worker.process.pid}`);
-    let input = parseInt(req.query.number);
-    let result = fibNumber(input);
-    res.send(`<h1>${result} worker ${cluster.worker.process.pid}</h1>`);
+    process.send(req.query.number);
+    console.log(`Process pid >>>> ${process.pid} received request.`);
+    // let input = parseInt(req.query.number);
+    // let result = fibNumber(input);
+    res.send(`<h1>Request received</h1>`);
   });
 
   app.listen(port, () =>
